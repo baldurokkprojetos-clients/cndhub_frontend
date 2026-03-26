@@ -1,7 +1,13 @@
 import axios from 'axios';
 
+const rawBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001';
+const normalizedBaseUrl = rawBaseUrl.replace(/\/+$/, '');
+const apiBaseUrl = normalizedBaseUrl.endsWith('/api/v1')
+  ? normalizedBaseUrl
+  : `${normalizedBaseUrl}/api/v1`;
+
 export const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001/api/v1',
+  baseURL: apiBaseUrl,
   headers: {
     'Content-Type': 'application/json',
   },
