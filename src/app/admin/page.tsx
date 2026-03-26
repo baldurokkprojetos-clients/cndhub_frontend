@@ -140,6 +140,8 @@ export default function AdminPage() {
     worker_timeout: "60",
     max_retries: "3",
     user_data_dir: "/worker/core/uc_profile",
+    worker_max_concurrent_browsers: "1",
+    worker_headless: "false",
     twocaptcha_api_key: "",
     resend_api_key: "",
     smtp_host: "",
@@ -395,7 +397,7 @@ export default function AdminPage() {
           <h1 className="text-3xl font-bold tracking-tight text-zinc-100 flex items-center gap-3">
             Administração
           </h1>
-          <p className="text-zinc-400 mt-1 text-sm font-medium">Gestão de usuários e configurações do worker.</p>
+          <p className="text-zinc-400 mt-1 text-sm font-medium">Gestão de usuários, worker e integrações.</p>
         </div>
       </motion.div>
 
@@ -412,9 +414,15 @@ export default function AdminPage() {
             </TabsTrigger>
           )}
           {userRole === 'master' && (
-            <TabsTrigger value="configuracoes" className="data-[state=active]:bg-zinc-800 data-[state=active]:text-lime-400">
+            <TabsTrigger value="worker-config" className="data-[state=active]:bg-zinc-800 data-[state=active]:text-lime-400">
               <SettingsIcon className="w-4 h-4 mr-2" />
-              Configurações do Worker
+              Worker
+            </TabsTrigger>
+          )}
+          {userRole === 'master' && (
+            <TabsTrigger value="integracoes" className="data-[state=active]:bg-zinc-800 data-[state=active]:text-lime-400">
+              <SettingsIcon className="w-4 h-4 mr-2" />
+              Integrações
             </TabsTrigger>
           )}
           {userRole === 'master' && (
@@ -496,7 +504,7 @@ export default function AdminPage() {
         </TabsContent>
 
         {userRole === 'master' && (
-          <TabsContent value="configuracoes" className="mt-0">
+          <TabsContent value="worker-config" className="mt-0">
             <motion.div 
               variants={containerVariants}
               initial="hidden"
@@ -511,7 +519,7 @@ export default function AdminPage() {
                       Configurações do Worker
                     </CardTitle>
                     <CardDescription className="text-zinc-400">
-                      Gerencie parâmetros de timeout, diretórios e integrações do sistema.
+                      Gerencie parâmetros do worker e automação.
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="pt-6 space-y-6">
@@ -526,13 +534,61 @@ export default function AdminPage() {
                           <Label htmlFor="max_retries" className="text-zinc-400">Máximo de Tentativas</Label>
                           <Input id="max_retries" value={workerConfig.max_retries} onChange={e => setWorkerConfig({...workerConfig, max_retries: e.target.value})} className="bg-zinc-900 border-zinc-800 text-zinc-100" />
                         </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="worker_max_concurrent_browsers" className="text-zinc-400">Navegadores Simultâneos</Label>
+                          <Input id="worker_max_concurrent_browsers" type="number" value={workerConfig.worker_max_concurrent_browsers} onChange={e => setWorkerConfig({...workerConfig, worker_max_concurrent_browsers: e.target.value})} className="bg-zinc-900 border-zinc-800 text-zinc-100" />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="worker_headless" className="text-zinc-400">Headless</Label>
+                          <Select value={workerConfig.worker_headless} onValueChange={(value) => setWorkerConfig({...workerConfig, worker_headless: value ?? "false"})}>
+                            <SelectTrigger className="bg-zinc-900 border-zinc-800 text-zinc-100">
+                              <SelectValue placeholder="Selecione" />
+                            </SelectTrigger>
+                            <SelectContent className="bg-zinc-900 border-zinc-800 text-zinc-100">
+                              <SelectItem value="false">Off</SelectItem>
+                              <SelectItem value="true">On</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
                         <div className="space-y-2 sm:col-span-2">
                           <Label htmlFor="user_data_dir" className="text-zinc-400">Diretório de Perfil do Chrome</Label>
                           <Input id="user_data_dir" value={workerConfig.user_data_dir} onChange={e => setWorkerConfig({...workerConfig, user_data_dir: e.target.value})} className="bg-zinc-900 border-zinc-800 text-zinc-100" />
                         </div>
                       </div>
                     </div>
-                    
+
+                    <div className="flex justify-end pt-4 border-t border-zinc-800/50 mt-6">
+                      <Button className="bg-lime-500 text-zinc-950 font-bold hover:bg-lime-400" onClick={handleSaveConfig} disabled={saveConfigMutation.isPending}>
+                        {saveConfigMutation.isPending ? "Salvando..." : "Salvar Configurações"}
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            </motion.div>
+          </TabsContent>
+        )}
+
+        {userRole === 'master' && (
+          <TabsContent value="integracoes" className="mt-0">
+            <motion.div 
+              variants={containerVariants}
+              initial="hidden"
+              animate="show"
+              className="grid gap-6 md:grid-cols-1"
+            >
+              <motion.div variants={itemVariants}>
+                <Card className="bg-zinc-900/50 border-zinc-800 backdrop-blur-sm shadow-xl">
+                  <CardHeader className="border-b border-zinc-800/50">
+                    <CardTitle className="text-lg font-bold text-zinc-100 flex items-center gap-2">
+                      <SettingsIcon className="h-5 w-5 text-lime-500" />
+                      Integrações
+                    </CardTitle>
+                    <CardDescription className="text-zinc-400">
+                      Configure integrações de terceiros e e-mail.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="pt-6 space-y-6">
                     <div className="space-y-4">
                       <h3 className="text-sm font-medium text-zinc-300 border-b border-zinc-800 pb-2">Integrações de Terceiros</h3>
                       <div className="grid gap-4 sm:grid-cols-2">
