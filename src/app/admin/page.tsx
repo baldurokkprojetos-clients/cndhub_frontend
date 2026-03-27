@@ -144,6 +144,7 @@ export default function AdminPage() {
     worker_headless: "false",
     twocaptcha_api_key: "",
     resend_api_key: "",
+    resend_from_email: "",
     smtp_host: "",
     smtp_port: "465",
     smtp_user: "",
@@ -599,6 +600,10 @@ export default function AdminPage() {
                         <div className="space-y-2 sm:col-span-2">
                           <Label htmlFor="resend_api_key" className="text-zinc-400">Resend API Key (E-mails)</Label>
                           <Input id="resend_api_key" type="password" value={workerConfig.resend_api_key} onChange={e => setWorkerConfig({...workerConfig, resend_api_key: e.target.value})} className="bg-zinc-900 border-zinc-800 text-zinc-100" placeholder="Insira a chave da API do Resend (ex: re_...)" />
+                        </div>
+                        <div className="space-y-2 sm:col-span-2">
+                          <Label htmlFor="resend_from_email" className="text-zinc-400">Resend From</Label>
+                          <Input id="resend_from_email" value={workerConfig.resend_from_email} onChange={e => setWorkerConfig({...workerConfig, resend_from_email: e.target.value})} className="bg-zinc-900 border-zinc-800 text-zinc-100" placeholder="Cadastro Politehub <email@dominio.com>" />
                         </div>
                         <div className="space-y-2">
                           <Label htmlFor="smtp_host" className="text-zinc-400">SMTP Host</Label>

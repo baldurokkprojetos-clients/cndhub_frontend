@@ -25,6 +25,20 @@ type Stats = {
 }
 
 export default function DashboardPage() {
+  const initialStats = () => {
+    if (typeof window === "undefined") {
+      return undefined
+    }
+    const cached = sessionStorage.getItem("dashboard_stats")
+    if (!cached) {
+      return undefined
+    }
+    try {
+      return JSON.parse(cached) as Stats
+    } catch {
+      return undefined
+    }
+  }
   const { data: stats = {
     total_clientes: 0,
     certidoes_emitidas: 0,
@@ -37,8 +51,13 @@ export default function DashboardPage() {
     queryKey: ['dashboard-stats'],
     queryFn: async () => {
       const { data } = await api.get('/dashboard/')
+      if (typeof window !== "undefined") {
+        sessionStorage.setItem("dashboard_stats", JSON.stringify(data))
+      }
       return data
-    }
+    },
+    initialData: initialStats,
+    staleTime: 30000
   })
 
   const getActivityIconAndColor = (status: string) => {
